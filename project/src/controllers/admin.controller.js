@@ -178,3 +178,62 @@ export const deleteQuestionById = async (req, res, next) => {
     next(error);
   }
 };
+
+
+
+
+export const getAdminDashBoard = async (req, res, next) => {
+  try {
+    var data = await AdminService.getAdminDashBoard(req.params.id);
+    console.log('data sent', data);
+    res.status(HttpStatus.OK).json({
+      code: HttpStatus.OK,
+      data: data,
+      message: 'DashBoard Details Fetched Succesfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminDashBoardbox = async (req, res, next) => {
+  try {
+    var data = await AdminService.getAdminDashBoardbox(req.params.id);
+    console.log('data sent box', data);
+    res.status(HttpStatus.OK).json({
+      code: HttpStatus.OK,
+      data: data,
+      message: 'DashBoard Details Fetched Succesfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminDashBoardbox2 = async (req, res, next) => {
+  try {
+    var data = await AdminService.getAdminDashBoardbox2(req.params.id);
+    console.log('data sent box', data);
+    res.status(HttpStatus.OK).json({
+      code: HttpStatus.OK,
+      data: data,
+      message: 'DashBoard Details Fetched Succesfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminDashBoardbox3 = async (req, res, next) => {
+  try {
+    var data = await AdminService.getAdminDashBoardbox3(req.params.id);
+    console.log('data sent box', data);
+    res.status(HttpStatus.OK).json({
+      code: HttpStatus.OK,
+      data: data,
+      message: 'DashBoard Details Fetched Succesfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};

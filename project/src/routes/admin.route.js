@@ -56,6 +56,16 @@ router.post('/insertQuestion/:courseId', AdminController.insertQuestion)
 
 router.delete('/deleteQuestion/:questionId',AdminController.deleteQuestionById)
 
+//===============================================================================
+
+router.get('/dashboard/:id', AdminController.getAdminDashBoard);
+
+router.get('/dashboardbox/:id', AdminController.getAdminDashBoardbox);
+
+router.get('/dashboardbox2/:id', AdminController.getAdminDashBoardbox2);
+
+router.get('/dashboardbox3/:id', AdminController.getAdminDashBoardbox3);
+
 
 
 export default router;
