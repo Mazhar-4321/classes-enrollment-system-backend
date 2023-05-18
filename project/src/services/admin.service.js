@@ -377,3 +377,72 @@ export const deleteQuestionById = async(questionId)=>{
     );
 }
 
+
+
+
+export const getAdminDashBoard = async (adminId) => {
+    const { QueryTypes } = require('sequelize');
+    var courses = await sequelize.query(
+      `SELECT course.name,course.seatsLeft, count(courses_enrolled.c_id) as enrollments FROM express.courses_enrolled
+          inner join audit on
+          audit.course_id=courses_enrolled.c_id
+          inner join course on
+          course.c_id=audit.course_id
+          where audit.created_by=?
+          group by audit.course_id`,
+      {
+        replacements: [adminId],
+        type: QueryTypes.SELECT
+      }
+    );
+  
+    console.log('courses fetched', courses);
+    return courses;
+  };
+  
+  
+  export const getAdminDashBoardbox = async (adminId) => {
+    const { QueryTypes } = require('sequelize');
+    var courses = await sequelize.query(
+      ` select COUNT( role_name ) from role where role_name = "student";`,
+      {
+        //replacements: [adminId],
+        type: QueryTypes.SELECT
+      }
+    );
+    
+    console.log('courses fetched', courses);
+    return courses;
+  };
+  
+  export const getAdminDashBoardbox2 = async (adminId) => {
+    const { QueryTypes } = require('sequelize');
+    var courses = await sequelize.query(
+      ` select COUNT( * ) from course ;`,
+      {
+        //replacements: [adminId],
+        type: QueryTypes.SELECT
+      }
+    );
+    
+    console.log('courses fetched', courses);
+    return courses;
+  };
+  
+  export const getAdminDashBoardbox3 = async () => {
+    const { QueryTypes } = require('sequelize');
+    var courses = await sequelize.query(
+      ` select COUNT( * ) from course_notes ;`,
+      {
+        //replacements: [adminId],
+        type: QueryTypes.SELECT
+      }
+    );
+    
+    console.log('courses fetched', courses);
+    return courses;
+  };
+  
+  
+  //====
+  
