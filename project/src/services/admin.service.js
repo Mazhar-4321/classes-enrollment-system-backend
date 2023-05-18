@@ -4,73 +4,72 @@ const { QueryTypes, JSON } = require('sequelize');
 
 
 
-export const addCourse = async (body, files) => {
-    var response = null;
+export const addCourse = async (body) => {
     try {
-            const course_id = Date.now();
-            body.url = 'Youtube Video';
-            body.seatsLeft = 10;
-            var courseInsertResponse = await sequelize.query(
-                `insert into course(c_id,name,lastDate,duration,seatsLeft,course_description,url)
-        values(?,?,?,?,?,?,?)`,
-                {
-                    replacements: [course_id, body.courseName, body.lastDayToEnroll,
-                        body.duration, body.seatsLeft,
-                        body.courseDescription, body.url],
-                    type: QueryTypes.INSERT
-                }
-            );
-            var courseNotesResponse = await sequelize.query(
-                `insert into course_notes(c_id,notes)
-        values(${course_id},'abc.pdf')`,
-                {
-                    replacements: [body.id],
-                    type: QueryTypes.INSERT
-                }
-            );
-            var courseInstructorResponse = await sequelize.query(
-                `insert into course_instructor(c_id,instructor)
-        values(?,?)`,
-                {
-                    replacements: [course_id, body.instructorName],
-                    type: QueryTypes.INSERT
-                }
-            );
-            var auditResponse = await await sequelize.query(
-                `insert into audit(course_id,created_by)
-        values(?,?)`,
-                {
-                    replacements: [course_id, body.email],
-                    type: QueryTypes.INSERT
-                }
-            );
-            return auditResponse
-
-        
-
-
-
-    } catch (error) {
-
-      
-
+      const { QueryTypes, JSON } = require('sequelize');
+      const course_id = Date.now();
+  
+      // body.url = 'Youtube Video';
+      body.seatsLeft = 10;
+      console.log(body);
+      var courseInsertResponse = await sequelize.query(
+        `insert into course(c_id,name,lastDate,duration,seatsLeft,course_description,url,fee)
+      values(?,?,?,?,?,?,?,?)`,
+        {
+          replacements: [
+            course_id,
+            body.name,
+            body.lastDate,
+            body.duration,
+            body.seatsLeft,
+            body.courseDescription,
+            body.url,
+            body.fee
+          ],
+          type: QueryTypes.INSERT
+        }
+      );
+      var courseInstructorResponse = await sequelize.query(
+        `insert into course_notes(c_id,notes)
+      values${getMultipleValues(course_id, body.notes)}`,
+        {
+          replacements: [],
+          type: QueryTypes.INSERT
+        }
+      );
+      var courseInstructorResponse = await sequelize.query(
+        `insert into course_instructor(c_id,instructor)
+      values(?,?)`,
+        {
+          replacements: [course_id, body.instructorName],
+          type: QueryTypes.INSERT
+        }
+      );
+      var auditResponse = await await sequelize.query(
+        `insert into audit(course_id,created_by)
+      values(?,?)`,
+        {
+          replacements: [course_id, body.email],
+          type: QueryTypes.INSERT
+        }
+      );
+      return auditResponse;
+    } catch (err) {
+      console.log('err', err);
+      throw new Error('invalid');
     }
-    return response;
+  };
 
-
-
-
-}
-
-export const updateCourse = async (req) => {
+  export const updateCourse = async (req) => {
+    console.log(req.body);
     try {
         const { QueryTypes, JSON } = require('sequelize');
         var courseUpdateResponse = await sequelize.query(
-            `update course set name=?,lastDate=?,duration=?,course_description=?
+            `update course set name=?,lastDate=?,duration=?,course_description=?,url=?,fee=?
                 where c_id=?`,
             {
                 replacements: [req.body.name, req.body.lastDate, req.body.duration,
-                req.body.courseDescription, req.body.courseId],
+                req.body.courseDescription,req.body.url,req.body.fee, req.body.courseId],
                 type: QueryTypes.UPDATE
             }
         );
@@ -92,11 +91,12 @@ export const updateCourse = async (req) => {
         );
         return courseInstructorResponse
     } catch (err) {
+      console.log("===== ERROR====== ",err)
         throw new Error(err)
     }
-
+  
     return null;
-}
+  }
 
 export const getCourseById = async (courseId) => {
     const { QueryTypes } = require('sequelize');
