@@ -14,7 +14,7 @@ const { QueryTypes } = require('sequelize');
 
 export const availableCourses = async () => {
     var response = await sequelize.query(`
-    select c.c_id,c.name,ci.instructor,c.lastDate,c.duration,c.seatsLeft,c.course_description 
+    select c.c_id,c.name,ci.instructor,c.lastDate,c.duration,c.seatsLeft,c.course_description,c.fee 
     from course c
     inner join course_instructor ci
     on c.c_id=ci.c_id
@@ -133,15 +133,29 @@ where qu.c_id=? ;`
             replacements: [courseId],
             type: QueryTypes.SELECT
         })
-
-    return response;
+        if(response.length<10){
+            throw new Error("Quiz Doesn't Have Enough Questions")
+        }
+        console.log(response)
+        let questionCount=0;
+        let questionArray=[];
+        
+        while(questionCount<10){
+         const index=Math.floor( Math.random() * response.length);
+         console.log(index,response[index].question_id)
+         questionArray.push(response[index])
+         response.splice(index,1);
+         response.forEach(e=>console.log(e.qustion_id))
+         questionCount++;
+        }
+console.log(questionArray)
+    return questionArray;
 }
 
 export const submitQuiz = async (req) => {
-    var count = 0;
     var questionAnswersMap = new Map()
     var paramsArray = req.params.courseId.split(",")
-    req.body.data.forEach(e => questionAnswersMap.set(e.question_id, e.answer))
+    req.body.data.forEach((e,i) => questionAnswersMap.set(e.question_id, e.answer))
     var response = await sequelize.query(`
     select question_id,answer from quiz where c_id=?`
         , {
@@ -179,6 +193,8 @@ export const submitQuiz = async (req) => {
 
 export const getHighestMarks = async (req) => {
     var paramsArray = req.params.courseId.split(",")
+    console.log(paramsArray)
+
     var certificateDownloadResponse = await sequelize.query(`
 select status from course_certificate_download where course_id=? and student_id=?;`
         , {

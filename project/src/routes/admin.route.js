@@ -49,7 +49,7 @@ router.post('/checkFiles', AdminController.updateCourse);
 
 
 router.put('/updateCourse', AdminController.updateCourse);
-router.get('/dashboard/:id', AdminController.getDashBoardDetails);
+//router.get('/dashboard/:id', AdminController.getDashBoardDetails);
 router.post('/updateQuestionById/:courseId', AdminController.updateQuestionById);
 
 router.post('/insertQuestion/:courseId', AdminController.insertQuestion)
