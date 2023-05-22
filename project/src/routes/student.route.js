@@ -16,11 +16,11 @@ router.get('/quiz/:courseId', studentAuth, StudentController.getQuiz);
 
 router.post('/quiz/:courseId', studentAuth, StudentController.submitQuiz);
 
-router.get('/marks/:courseId', StudentController.getHighestMarks);
+router.get('/marks/:courseId',studentAuth, StudentController.getHighestMarks);
 
-router.post('/cancelCourse', StudentController.cancelCourse);
+router.post('/cancelCourse',studentAuth, StudentController.cancelCourse);
 
-router.put('/image/:id',StudentController.getImageById)
+router.put('/image/:id',studentAuth,StudentController.getImageById)
 
 
 
