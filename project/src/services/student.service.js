@@ -14,7 +14,9 @@ const { QueryTypes } = require('sequelize');
 
 export const availableCourses = async () => {
     var response = await sequelize.query(`
-    select c.c_id,c.name,ci.instructor,c.lastDate,c.duration,c.seatsLeft,c.course_description,c.fee 
+
+    select c.c_id,c.name,ci.instructor,c.lastDate,c.duration,c.seatsLeft,c.course_description,c.fee
+
     from course c
     inner join course_instructor ci
     on c.c_id=ci.c_id
@@ -47,7 +49,7 @@ export const getImageById = async (id) => {
 export const myCourses = async (email) => {
     var response = await sequelize.query(`select c.c_id,c.name ,cn.notes ,ci.instructor 
     ,c.lastDate ,
-     c.duration ,c.course_description 
+     c.duration ,c.course_description ,c.url
         from course c
         inner join courses_enrolled ce
         on c.c_id=ce.c_id
