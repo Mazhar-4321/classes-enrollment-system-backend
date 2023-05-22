@@ -47,7 +47,7 @@ export const getImageById = async (id) => {
 export const myCourses = async (email) => {
     var response = await sequelize.query(`select c.c_id,c.name ,cn.notes ,ci.instructor 
     ,c.lastDate ,
-     c.duration ,c.course_description 
+     c.duration ,c.course_description ,c.url
         from course c
         inner join courses_enrolled ce
         on c.c_id=ce.c_id
