@@ -14,7 +14,7 @@ const { QueryTypes } = require('sequelize');
 
 export const availableCourses = async () => {
     var response = await sequelize.query(`
-    select c.c_id,c.name,ci.instructor,c.lastDate,c.duration,c.seatsLeft,c.course_description 
+    select c.c_id,c.name,ci.instructor,c.lastDate,c.duration,c.seatsLeft,c.course_description,c.fee
     from course c
     inner join course_instructor ci
     on c.c_id=ci.c_id
