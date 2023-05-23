@@ -133,29 +133,29 @@ where qu.c_id=? ;`
             replacements: [courseId],
             type: QueryTypes.SELECT
         })
-        if(response.length<10){
-            throw new Error("Quiz Doesn't Have Enough Questions")
-        }
-        console.log(response)
-        let questionCount=0;
-        let questionArray=[];
-        
-        while(questionCount<10){
-         const index=Math.floor( Math.random() * response.length);
-         console.log(index,response[index].question_id)
-         questionArray.push(response[index])
-         response.splice(index,1);
-         response.forEach(e=>console.log(e.qustion_id))
-         questionCount++;
-        }
-console.log(questionArray)
+    if (response.length < 10) {
+        throw new Error("Quiz Doesn't Have Enough Questions")
+    }
+    console.log(response)
+    let questionCount = 0;
+    let questionArray = [];
+
+    while (questionCount < 10) {
+        const index = Math.floor(Math.random() * response.length);
+        console.log(index, response[index].question_id)
+        questionArray.push(response[index])
+        response.splice(index, 1);
+        response.forEach(e => console.log(e.qustion_id))
+        questionCount++;
+    }
+    console.log(questionArray)
     return questionArray;
 }
 
 export const submitQuiz = async (req) => {
     var questionAnswersMap = new Map()
     var paramsArray = req.params.courseId.split(",")
-    req.body.data.forEach((e,i) => questionAnswersMap.set(e.question_id, e.answer))
+    req.body.data.forEach((e, i) => questionAnswersMap.set(e.question_id, e.answer))
     var response = await sequelize.query(`
     select question_id,answer from quiz where c_id=?`
         , {
@@ -163,25 +163,42 @@ export const submitQuiz = async (req) => {
             type: QueryTypes.SELECT
         })
     if (response) {
-
+        var marks = response.filter(e => questionAnswersMap.get(e.question_id) === e.answer).length
         try {
-            var marks = response.filter(e => questionAnswersMap.get(e.question_id) === e.answer).length
             var response = await sequelize.query(
-                ` insert into quiz_students(c_id,marks,entry,student_id)
-    values(?,?,?,?);`,
+                ` insert into certificate(course_id,student_id,status,current_marks)
+    values(?,?,0,?);`,
                 {
-                    replacements: [paramsArray[0], marks, Date.now(), paramsArray[1]],
+                    replacements: [paramsArray[0], paramsArray[1], marks],
                     type: QueryTypes.INSERT
                 }
             );
 
-            if (response) {
-                return {
-                    marks: marks
-                }
-            }
-        } catch (err) {
 
+        } catch (err) {
+            var quizData=await sequelize.query(
+                ` select current_marks from certificate
+                where course_id=? and student_id=?
+                `,
+                {
+                    replacements: [paramsArray[0], paramsArray[1]],
+                    type: QueryTypes.SELECT
+                }
+            );
+            const {current_marks} = quizData
+            if(marks>current_marks)
+            var response = await sequelize.query(
+                ` update  certificate set previous_marks=current_marks , current_marks=?
+                where course_id=? and student_id=?
+                `,
+                {
+                    replacements: [marks, paramsArray[0], paramsArray[1]],
+                    type: QueryTypes.UPDATE
+                }
+            );
+        }
+        return {
+            marks: marks
         }
     } else {
         throw new Error('error')
@@ -193,33 +210,35 @@ export const submitQuiz = async (req) => {
 
 export const getHighestMarks = async (req) => {
     var paramsArray = req.params.courseId.split(",")
-    console.log(paramsArray)
 
-    var certificateDownloadResponse = await sequelize.query(`
-select status from course_certificate_download where course_id=? and student_id=?;`
+    var certificateResponse = await sequelize.query(`
+select status,current_marks,previous_marks from certificate where course_id=? and student_id=?;`
         , {
             replacements: [paramsArray[0], paramsArray[1]],
             type: QueryTypes.SELECT
         })
-    if (certificateDownloadResponse[0].status == 0) {
-        var response = await sequelize.query(`
-    select MAX(s1.m) as max from (select c_id,student_id,marks m
-        from express.quiz_students where c_id=? and student_id=?)s1;`
-            , {
-                replacements: [paramsArray[0], paramsArray[1]],
-                type: QueryTypes.SELECT
-            })
 
-        if (response[0].max > 6) {
-            return "Success"
-        } else {
-            return "Fail"
-        }
-
-        return response;
-    } else {
-        return "Cant Download , Request Admin For Redownload"
+    console.log("certificate Response", certificateResponse.length);
+    if (certificateResponse.length == 0) {
+        return -1;
     }
+    const {status,current_marks,previous_marks}=certificateResponse[0]
+    if(status==0){
+        if(current_marks>=8){
+            var certificateResponse = await sequelize.query(`
+update certificate set status=1 where course_id=? and student_id=?;`
+        , {
+            replacements: [paramsArray[0], paramsArray[1]],
+            type: QueryTypes.SELECT
+        })
+
+        }
+      return current_marks
+    }
+    if(status==1 && current_marks<previous_marks){
+         return -2;
+    }
+    return current_marks;
 }
 
 export const cancelCourse = async (req) => {
