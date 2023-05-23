@@ -28,6 +28,7 @@ export const updateCourse = async (req, res, next) => {
     next(error);
   }
 };
+
 export const checkFiles = async (req, res, next) => {
   try {
     await AdminService.checkFiles(req.body);
@@ -40,6 +41,7 @@ export const checkFiles = async (req, res, next) => {
     next(error);
   }
 };
+
 export const getCourseById = async (req, res, next) => {
   try {
     var data = await AdminService.getCourseById(req.params.id);
@@ -179,13 +181,10 @@ export const deleteQuestionById = async (req, res, next) => {
   }
 };
 
-
-
-
 export const getAdminDashBoard = async (req, res, next) => {
   try {
     var data = await AdminService.getAdminDashBoard(req.params.id);
-    console.log('data sent', data);
+    console.log('data sent ===================>', data);
     res.status(HttpStatus.OK).json({
       code: HttpStatus.OK,
       data: data,

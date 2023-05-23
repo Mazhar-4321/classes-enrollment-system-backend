@@ -4,6 +4,7 @@ const { QueryTypes, JSON } = require('sequelize');
 
 
 
+
 export const addCourse = async (body) => {
     try {
       const { QueryTypes, JSON } = require('sequelize');
@@ -58,9 +59,9 @@ export const addCourse = async (body) => {
       console.log('err', err);
       throw new Error('invalid');
     }
-  };
+};
 
-  export const updateCourse = async (req) => {
+export const updateCourse = async (req) => {
     console.log(req.body);
     try {
         const { QueryTypes, JSON } = require('sequelize');
@@ -96,17 +97,16 @@ export const addCourse = async (body) => {
     }
   
     return null;
-  }
+}
 
 export const getCourseById = async (courseId) => {
     const { QueryTypes } = require('sequelize');
     var courses = await sequelize.query(
-        `SELECT s1.notes,course.name,course.lastDate,course.duration,course.course_description,course_instructor.instructor FROM course
+        `SELECT s1.notes,course.name,course.lastDate,course.duration,course.course_description,course.url,course.fee,course_instructor.instructor FROM course
         inner join course_instructor on
         course.c_id=course_instructor.c_id
         inner join (select group_concat(notes) as notes from course_notes where c_id=? group by c_id)s1
-        
-        where course.c_id=?;`,
+         where course.c_id=?;`,
         {
             replacements: [courseId, courseId],
             type: QueryTypes.SELECT
@@ -151,7 +151,6 @@ const getMultipleValuesforAWS = (c_id, notesArray = []) => {
     }
     return string;
 }
-
 const getMultipleValuesForQuiz = (c_id, notesArray = []) => {
     var string = ''
     for (var i = 0; i < notesArray.length; i++) {
@@ -229,6 +228,7 @@ const getMultipleValuesForQuestions = (questions = []) => {
     }
     return string;
 }
+
 export const addQuiz = async (req) => {
     try {
         var courseId = req.params.id;
@@ -273,6 +273,7 @@ export const getCertificateRequests = async (adminId) => {
     );
     return courses;
 }
+
 export const getDashBoardDetails = async (adminId) => {
 
     const { QueryTypes } = require('sequelize');
@@ -291,6 +292,7 @@ export const getDashBoardDetails = async (adminId) => {
     );
     return courses;
 }
+
 export const getQuizQuestions = async (courseId) => {
     const { QueryTypes } = require('sequelize');
     var quizQuestions = await sequelize.query(
@@ -377,10 +379,8 @@ export const deleteQuestionById = async(questionId)=>{
     );
 }
 
-
-
-
 export const getAdminDashBoard = async (adminId) => {
+    console.log("--------------------------------------------------------------")
     const { QueryTypes } = require('sequelize');
     var courses = await sequelize.query(
       `SELECT course.name,course.seatsLeft, count(courses_enrolled.c_id) as enrollments FROM express.courses_enrolled
@@ -396,12 +396,11 @@ export const getAdminDashBoard = async (adminId) => {
       }
     );
   
-    console.log('courses fetched', courses);
+    console.log('courses fetched ==============>', courses);
     return courses;
-  };
-  
-  
-  export const getAdminDashBoardbox = async (adminId) => {
+};
+   
+export const getAdminDashBoardbox = async (adminId) => {
     const { QueryTypes } = require('sequelize');
     var courses = await sequelize.query(
       ` select COUNT( role_name ) from role where role_name = "student";`,
@@ -413,9 +412,9 @@ export const getAdminDashBoard = async (adminId) => {
     
     console.log('courses fetched', courses);
     return courses;
-  };
+};
   
-  export const getAdminDashBoardbox2 = async (adminId) => {
+export const getAdminDashBoardbox2 = async (adminId) => {
     const { QueryTypes } = require('sequelize');
     var courses = await sequelize.query(
       ` select COUNT( * ) from course ;`,
@@ -427,9 +426,9 @@ export const getAdminDashBoard = async (adminId) => {
     
     console.log('courses fetched', courses);
     return courses;
-  };
+};
   
-  export const getAdminDashBoardbox3 = async () => {
+export const getAdminDashBoardbox3 = async () => {
     const { QueryTypes } = require('sequelize');
     var courses = await sequelize.query(
       ` select COUNT( * ) from course_notes ;`,
@@ -441,7 +440,7 @@ export const getAdminDashBoard = async (adminId) => {
     
     console.log('courses fetched', courses);
     return courses;
-  };
+};
   
   
   //====
