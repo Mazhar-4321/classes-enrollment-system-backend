@@ -178,7 +178,7 @@ export const submitQuiz = async (req) => {
 
 
         } catch (err) {
-            var quizData=await sequelize.query(
+            var quizData = await sequelize.query(
                 ` select current_marks from certificate
                 where course_id=? and student_id=?
                 `,
@@ -187,17 +187,18 @@ export const submitQuiz = async (req) => {
                     type: QueryTypes.SELECT
                 }
             );
-            const {current_marks} = quizData
-            if(marks>current_marks)
-            var response = await sequelize.query(
-                ` update  certificate set previous_marks=current_marks , current_marks=?
+            const { current_marks } = quizData[0]
+            console.log("currrrrrr", current_marks)
+            if (marks > current_marks)
+                var response = await sequelize.query(
+                    ` update  certificate set previous_marks=current_marks , current_marks=?
                 where course_id=? and student_id=?
                 `,
-                {
-                    replacements: [marks, paramsArray[0], paramsArray[1]],
-                    type: QueryTypes.UPDATE
-                }
-            );
+                    {
+                        replacements: [marks, paramsArray[0], paramsArray[1]],
+                        type: QueryTypes.UPDATE
+                    }
+                );
         }
         return {
             marks: marks
@@ -224,21 +225,24 @@ select status,current_marks,previous_marks from certificate where course_id=? an
     if (certificateResponse.length == 0) {
         return -1;
     }
-    const {status,current_marks,previous_marks}=certificateResponse[0]
-    if(status==0){
-        if(current_marks>=8){
-            var certificateResponse = await sequelize.query(`
-update certificate set status=1 where course_id=? and student_id=?;`
-        , {
-            replacements: [paramsArray[0], paramsArray[1]],
-            type: QueryTypes.SELECT
-        })
-
+    const { status, current_marks, previous_marks } = certificateResponse[0]
+    if (status == 0) {
+        if (current_marks >= 8) {
+            try {
+                var certificateResponse = await sequelize.query(`
+                    update certificate set status=1,previous_marks=current_marks,current_marks=0 where course_id=? and student_id=?;`
+                    , {
+                        replacements: [paramsArray[0], paramsArray[1]],
+                        type: QueryTypes.UPDATE
+                    })
+            } catch (err) {
+                console.log("errr", err)
+            }
         }
-      return current_marks
+        return current_marks
     }
-    if(status==1 && current_marks<previous_marks){
-         return -2;
+    if (status == 1 && current_marks < previous_marks) {
+        return -2;
     }
     return current_marks;
 }
